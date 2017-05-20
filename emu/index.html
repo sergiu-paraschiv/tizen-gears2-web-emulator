@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+        }
+
+        #tpl {
+            position: absolute;
+            z-index: 300;
+            top: 30px;
+            left: 30px;
+            opacity: .0;
+            width: 300px;
+            height: 300px;
+            pointer-events: none;
+        }
+
+        #emu-frame {
+            position: relative;
+            z-index: 200;
+            width: 360px;
+            height: 360px;
+            border: none;
+            border-radius: 50%;
+            border: 0 solid red;
+        }
+    </style>
+</head>
+
+<body>
+    <img id="tpl" src="/bg.png" />
+    <iframe id="emu-frame" src="/app/index.html" onload="handleLoad()"></iframe>
+
+    <script>
+        window.tizen = {
+            time: {
+                getCurrentDateTime: function() {
+                    var date = new Date();
+                    //date.setHours(24);
+                    //date.setMinutes(0);
+
+                    return date;
+                },
+
+                setTimezoneChangeListener: function(listener) {
+                    // TODO
+                }
+            }
+        };
+
+        window.battery = {
+            level: 0.99,
+            addEventListener: function(eventName, callback) {
+                callback();
+            }
+        };
+
+        function timetick() {
+            var emuFrame = document.getElementById('emu-frame');
+
+            var event = new CustomEvent('timetick');
+            emuFrame.contentWindow.document.dispatchEvent(event);
+        }
+
+        function visibilitychange(isHidden) {
+            if (!isHidden) {
+                isHidden = false;
+            }
+
+            var emuFrame = document.getElementById('emu-frame');
+
+            emuFrame.contentWindow.document.hidden = isHidden;
+
+            var event = new CustomEvent('visibilitychange');
+            emuFrame.contentWindow.document.dispatchEvent(event);
+        }
+
+        function handleLoad() {
+            setInterval(timetick, 1000 * 60); // once a minute
+            visibilitychange(false);
+        }
+    </script>
+</body>
+
+</html>
